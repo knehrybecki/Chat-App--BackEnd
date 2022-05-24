@@ -1,6 +1,7 @@
+import { Person } from './types'
 import express from 'express'
 import { createServer } from 'http'
-import { Server } from "socket.io"
+import { Server } from 'socket.io'
 
 const app = express()
 const server = createServer(app)
@@ -8,16 +9,11 @@ const server = createServer(app)
 const io = new Server(server, {
   cors: {
     origin: 'http://localhost:3001',
-    methods: ["GET", "POST"]
+    methods: ['GET', 'POST']
   }
 })
 
-type Person = {
-  userName: string,
-  roomName: string
-}
-
-let userData: Person[] = []
+let userData: Array<Person> = []
 
 io.on('connection', socket => {
   socket.on('userData', user => {
@@ -28,22 +24,21 @@ io.on('connection', socket => {
     io.to(user.roomName).emit('roomMessage', `${user.userName} joined the ${user.roomName}`)
   })
 
-  socket.on('chatMessage', (data) => {
+  socket.on('chatMessage', data => {
     const userRoom = userData.map((user) => user.roomName)
 
     io.to(userRoom).emit('message', {
       message: data.message,
       userName: data.user,
-      clientID: data.clientID
+      clientId: data.clientId
     })
   })
 
-  socket.on("send-img", (image) => {
+  socket.on('send-img', image => {
     const userRoom = userData.map(user => user.roomName)
 
     io.to(userRoom).emit('image', {
-      src: image,
-      userID: socket.id
+      src: image
     })
   })
 
