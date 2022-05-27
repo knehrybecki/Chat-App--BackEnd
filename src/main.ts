@@ -20,13 +20,13 @@ io.on('connection', socket => {
 
     socket.join(user.roomName)
 
-    io.to(user.roomName).emit('roomMessage', `${user.userName} joined the ${user.roomName}`)
+    io.to(user.roomName).emit('roomMessage', `You Joined to ${user.roomName}`)
   })
 
   socket.on('chatMessage', (message: PersonSendMessage) => {
-    const userRoom = userData.map(user => user.roomName)
+    const findUser: Person | undefined = userData.find(user => user.clientId === socket.id)
 
-    io.to(userRoom).emit('message', {
+    io.to(findUser?.roomName!).emit('message', {
       message: message.message,
       userName: message.userName,
       clientId: message.clientId
@@ -34,22 +34,21 @@ io.on('connection', socket => {
   })
 
   socket.on('send-img', (image: PersonSendImage) => {
-    const userRoom = userData.map(user => user.roomName)
+    const findUser: Person | undefined = userData.find(user => user.clientId === socket.id)
 
-    io.to(userRoom).emit('image', {
-      src: image
+    io.to(findUser?.roomName!).emit('image', {
+      src: image,
     })
   })
 
   socket.on('disconnect', () => {
-    const userRoom = userData.map(user => user.roomName)
-    const userName = userData.map(user => user.userName)
+    const findUser: Person | undefined = userData.find(user => user.clientId === socket.id)
+    
+    socket.leave(findUser?.roomName!)
 
-    socket.leave(userRoom.toString())
+    io.to(findUser?.roomName!).emit('roomMessage', `${findUser?.userName} left the ${findUser?.roomName}`)
 
-    io.to(userRoom).emit('roomMessage', `${userName} left the ${userRoom}`)
-
-    userData = []
+    userData = userData.filter(user => user.clientId !== socket.id)
   })
 })
 

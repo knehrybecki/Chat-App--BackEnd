@@ -1,6 +1,7 @@
 export type Person = {
   userName: string,
-  roomName: string
+  roomName: string,
+  clientId: string
 }
 
 export type PersonSendMessage = {
