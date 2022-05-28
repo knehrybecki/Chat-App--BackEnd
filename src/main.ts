@@ -26,33 +26,37 @@ io.on('connection', socket => {
   })
 
   socket.on('chatMessage', (message: PersonSendMessage) => {
-    const findUser= userData.find(user => user.clientId === socket.id)
+    const findUser = userData.find(user => user.clientId === socket.id)
 
-    io.to(findUser?.roomName!).emit('message', {
-      message: message.message,
-      userName: message.userName,
-      clientId: message.clientId
-    })
+    if (findUser !== undefined) {
+      io.to(findUser?.roomName!).emit('message', {
+        message: message.message,
+        userName: message.userName,
+        clientId: message.clientId
+      })
+    }
   })
 
   socket.on('send-img', (image: PersonSendImage) => {
     const findUser = userData.find(user => user.clientId === socket.id)
 
-    io.to(findUser?.roomName!).emit('image', {
-      src: image,
-    })
+    if (findUser !== undefined) {
+      io.to(findUser?.roomName!).emit('image', {
+        src: image,
+      })
+    }
   })
 
   socket.on('disconnect', () => {
     const findUser = userData.find(user => user.clientId === socket.id)
 
-    if (socket.id) {
+    if (findUser !== undefined) {
       socket.leave(findUser?.roomName!)
 
       io.to(findUser?.roomName!).emit('roomMessage', `${findUser?.userName} left the ${findUser?.roomName}`)
-    }
 
-    userData = userData.filter(user => user.clientId !== socket.id)
+      userData = userData.filter(user => user.clientId !== socket.id)
+    }
   })
 })
 
