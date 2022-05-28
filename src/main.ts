@@ -20,11 +20,13 @@ io.on('connection', socket => {
 
     socket.join(user.roomName)
 
-    io.to(user.roomName).emit('roomMessage', `You Joined to ${user.roomName}`)
+    socket.emit('roomMessage', `Youy Joined to ${user.roomName}`)
+
+    socket.broadcast.to(user.roomName).emit('roomMessage', `${user.userName} Joined to ${user.roomName}`)
   })
 
   socket.on('chatMessage', (message: PersonSendMessage) => {
-    const findUser: Person | undefined = userData.find(user => user.clientId === socket.id)
+    const findUser= userData.find(user => user.clientId === socket.id)
 
     io.to(findUser?.roomName!).emit('message', {
       message: message.message,
@@ -34,7 +36,7 @@ io.on('connection', socket => {
   })
 
   socket.on('send-img', (image: PersonSendImage) => {
-    const findUser: Person | undefined = userData.find(user => user.clientId === socket.id)
+    const findUser = userData.find(user => user.clientId === socket.id)
 
     io.to(findUser?.roomName!).emit('image', {
       src: image,
@@ -42,11 +44,13 @@ io.on('connection', socket => {
   })
 
   socket.on('disconnect', () => {
-    const findUser: Person | undefined = userData.find(user => user.clientId === socket.id)
-    
-    socket.leave(findUser?.roomName!)
+    const findUser = userData.find(user => user.clientId === socket.id)
 
-    io.to(findUser?.roomName!).emit('roomMessage', `${findUser?.userName} left the ${findUser?.roomName}`)
+    if (socket.id) {
+      socket.leave(findUser?.roomName!)
+
+      io.to(findUser?.roomName!).emit('roomMessage', `${findUser?.userName} left the ${findUser?.roomName}`)
+    }
 
     userData = userData.filter(user => user.clientId !== socket.id)
   })
