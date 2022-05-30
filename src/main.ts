@@ -1,7 +1,18 @@
 import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
-import { Person, PersonSendImage, PersonSendMessage } from './types'
+import {
+  addMessageToRoom,
+  addUser,
+  allMessageInRoom,
+  deleteUser,
+  getMessageFromRoom
+} from './firebase'
+import {
+  Person,
+  PersonSendImage,
+  PersonSendMessage
+} from './types'
 
 const app = express()
 const server = createServer(app)
@@ -13,32 +24,51 @@ const io = new Server(server, {
 })
 
 let userData: Array<Person> = []
+export let allMessageFromRoom: Array<PersonSendImage | PersonSendMessage> = []
 
 io.on('connection', socket => {
-  socket.on('userData', (user: Person) => {
+  socket.on('userData', async (user: Person) => {
     userData = userData.concat(user)
 
-    socket.join(user.roomName)
+    const roomName = user.roomName
 
-    socket.emit('roomMessage', `Youy Joined to ${user.roomName}`)
+    socket.join(roomName)
 
-    socket.broadcast.to(user.roomName).emit('roomMessage', `${user.userName} Joined to ${user.roomName}`)
+    addUser(user)
+
+    await addMessageToRoom(roomName)
+
+    socket.emit('addMessageToRoom', allMessageInRoom)
+
+    socket.emit('roomMessage', `You Joined to ${roomName}`)
+
+    socket.broadcast.to(roomName).emit('roomMessage', `${user.userName} Joined to ${user.roomName}`)
   })
 
   socket.on('chatMessage', (message: PersonSendMessage) => {
     const findUser = userData.find(user => user.clientId === socket.id)
+    const dataMessage = {
+      message: message.message,
+      userName: message.userName,
+      clientId: message.clientId,
+      hoursSend: message.hoursSend
+    }
 
     if (findUser !== undefined) {
-      io.to(findUser?.roomName!).emit('message', {
-        message: message.message,
-        userName: message.userName,
-        clientId: message.clientId
-      })
+      allMessageFromRoom = allMessageFromRoom.concat(dataMessage)
+
+      getMessageFromRoom(findUser?.roomName!, allMessageFromRoom)
+
+      io.to(findUser?.roomName!).emit('message', dataMessage)
     }
   })
 
   socket.on('send-img', (image: PersonSendImage) => {
     const findUser = userData.find(user => user.clientId === socket.id)
+
+    allMessageFromRoom = allMessageFromRoom.concat(image)
+
+    getMessageFromRoom(findUser?.roomName!, allMessageFromRoom)
 
     if (findUser !== undefined) {
       io.to(findUser?.roomName!).emit('image', {
@@ -53,6 +83,10 @@ io.on('connection', socket => {
     if (findUser !== undefined) {
       socket.leave(findUser?.roomName!)
 
+      deleteUser(socket.id)
+
+      allMessageFromRoom = []
+      
       io.to(findUser?.roomName!).emit('roomMessage', `${findUser?.userName} left the ${findUser?.roomName}`)
 
       userData = userData.filter(user => user.clientId !== socket.id)

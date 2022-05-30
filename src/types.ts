@@ -8,6 +8,7 @@ export type PersonSendMessage = {
   message: string,
   userName: string,
   clientId: string,
+  hoursSend: string
 }
 
 export type PersonSendImage = {
