@@ -24,20 +24,17 @@ const firebaseConfig = {
 const firebaseapp = initializeApp(firebaseConfig)
 const db = getFirestore(firebaseapp)
 
-export let allMessageInRoom: Array<DocumentData | null | undefined> = []
+export let allMessageInRoom: Array<DocumentData | undefined> = []
 
 export const addUser = async (user: Person) => {
-  const clientId = user.clientId
-  const userName = user.userName
-  const userRoom = user.roomName
+  const { clientId, userName, roomName } = user
 
   await setDoc(doc(db, 'users', clientId), {
     userName,
-    userRoom
+    roomName
   })
     .catch(error => {
       alert(error)
-      return null
     })
 }
 
@@ -45,7 +42,6 @@ export const getMessageFromRoom = async (room: string, messages: Array<PersonSen
   await setDoc(doc(db, 'rooms', room), { messages })
     .catch(error => {
       alert(error)
-      return null
     })
 }
 
@@ -56,7 +52,6 @@ export const addMessageToRoom = async (roomName: string) => {
   const docSnap = await getDoc(docRef)
     .catch(error => {
       alert(error)
-      return null
     })
 
   const docData = docSnap?.data()
@@ -70,6 +65,5 @@ export const deleteUser = async (clientId: string) => {
   await deleteDoc(doc(db, 'users', clientId))
     .catch(error => {
       alert(error)
-      return null
     })
 }

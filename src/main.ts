@@ -43,13 +43,14 @@ io.on('connection', socket => {
     socket.broadcast.to(roomName).emit('roomMessage', `${user.userName} Joined to ${user.roomName}`)
   })
 
-  socket.on('chatMessage', (message: PersonSendMessage) => {
+  socket.on('chatMessage', (messages: PersonSendMessage) => {
     const findUser = userData.find(user => user.clientId === socket.id)
+    const { message, userName, clientId, createdAt} = messages
     const dataMessage = {
-      message: message.message,
-      userName: message.userName,
-      clientId: message.clientId,
-      createdAt: message.createdAt
+      message,
+      userName,
+      clientId,
+      createdAt
     }
 
     if (findUser !== undefined) {
