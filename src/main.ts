@@ -38,9 +38,7 @@ io.on('connection', socket => {
 
     await addMessageToRoom(roomName)
 
-    socket.emit('addMessageToRoom', allMessageInRoom)
-
-    socket.emit('roomMessage', `You Joined to ${roomName}`)
+    socket.emit('roomMessage', `You Joined to ${roomName}`, allMessageInRoom)
 
     socket.broadcast.to(roomName).emit('roomMessage', `${user.userName} Joined to ${user.roomName}`)
   })
@@ -51,7 +49,7 @@ io.on('connection', socket => {
       message: message.message,
       userName: message.userName,
       clientId: message.clientId,
-      hoursSend: message.hoursSend
+      createdAt: message.createdAt
     }
 
     if (findUser !== undefined) {
@@ -71,9 +69,7 @@ io.on('connection', socket => {
     getMessageFromRoom(findUser?.roomName!, allMessageFromRoom)
 
     if (findUser !== undefined) {
-      io.to(findUser?.roomName!).emit('image', {
-        src: image,
-      })
+      io.to(findUser?.roomName!).emit('image', image)
     }
   })
 

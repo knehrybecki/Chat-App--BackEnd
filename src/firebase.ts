@@ -1,7 +1,10 @@
 import { initializeApp } from 'firebase/app'
 import {
   deleteDoc,
-  doc, DocumentData, getDoc, getFirestore,
+  doc,
+  DocumentData,
+  getDoc,
+  getFirestore,
   setDoc
 } from 'firebase/firestore'
 import {
@@ -33,15 +36,15 @@ export const addUser = async (user: Person) => {
     userRoom
   })
     .catch(error => {
-      console.log(error)
+      alert(error)
       return null
     })
 }
 
-export const getMessageFromRoom = async (room: string, getAllMessage: Array<PersonSendImage | PersonSendMessage>) => {
-  await setDoc(doc(db, 'rooms', room), { getAllMessage })
+export const getMessageFromRoom = async (room: string, messages: Array<PersonSendImage | PersonSendMessage>) => {
+  await setDoc(doc(db, 'rooms', room), { messages })
     .catch(error => {
-      console.log(error)
+      alert(error)
       return null
     })
 }
@@ -52,7 +55,7 @@ export const addMessageToRoom = async (roomName: string) => {
   const docRef = doc(db, 'rooms', roomName)
   const docSnap = await getDoc(docRef)
     .catch(error => {
-      console.log(error)
+      alert(error)
       return null
     })
 
@@ -66,7 +69,7 @@ export const addMessageToRoom = async (roomName: string) => {
 export const deleteUser = async (clientId: string) => {
   await deleteDoc(doc(db, 'users', clientId))
     .catch(error => {
-      console.log(error)
+      alert(error)
       return null
     })
 }
