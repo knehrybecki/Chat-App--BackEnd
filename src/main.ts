@@ -9,9 +9,9 @@ import {
   getMessageFromRoom
 } from './firebase'
 import {
-  Person,
-  PersonSendImage,
-  PersonSendMessage
+  ImageMessage,
+  TextMessage,
+  User
 } from './types'
 
 const app = express()
@@ -23,11 +23,11 @@ const io = new Server(server, {
   }
 })
 
-let userData: Array<Person> = []
-export let allMessageFromRoom: Array<PersonSendImage | PersonSendMessage> = []
+let userData: Array<User> = []
+export let allMessageFromRoom: Array<ImageMessage | TextMessage> = []
 
 io.on('connection', socket => {
-  socket.on('userData', async (user: Person) => {
+  socket.on('userData', async (user: User) => {
     userData = userData.concat(user)
 
     const roomName = user.roomName
@@ -43,8 +43,8 @@ io.on('connection', socket => {
     socket.broadcast.to(roomName).emit('roomMessage', `${user.userName} Joined to ${user.roomName}`)
   })
 
-  socket.on('chatMessage', (messages: PersonSendMessage) => {
-    const findUser = userData.find(user => user.clientId === socket.id)
+  socket.on('chatMessage', (messages: TextMessage) => {
+    const foundUser = userData.find(user => user.clientId === socket.id)
     const { message, userName, clientId, createdAt} = messages
     const dataMessage = {
       message,
@@ -53,38 +53,38 @@ io.on('connection', socket => {
       createdAt
     }
 
-    if (findUser !== undefined) {
+    if (foundUser !== undefined) {
       allMessageFromRoom = allMessageFromRoom.concat(dataMessage)
 
-      getMessageFromRoom(findUser?.roomName!, allMessageFromRoom)
+      getMessageFromRoom(foundUser?.roomName!, allMessageFromRoom)
 
-      io.to(findUser?.roomName!).emit('message', dataMessage)
+      io.to(foundUser?.roomName!).emit('message', dataMessage)
     }
   })
 
-  socket.on('send-img', (image: PersonSendImage) => {
-    const findUser = userData.find(user => user.clientId === socket.id)
+  socket.on('send-img', (image: ImageMessage) => {
+    const foundUser = userData.find(user => user.clientId === socket.id)
 
     allMessageFromRoom = allMessageFromRoom.concat(image)
 
-    getMessageFromRoom(findUser?.roomName!, allMessageFromRoom)
+    getMessageFromRoom(foundUser?.roomName!, allMessageFromRoom)
 
-    if (findUser !== undefined) {
-      io.to(findUser?.roomName!).emit('image', image)
+    if (foundUser !== undefined) {
+      io.to(foundUser?.roomName!).emit('image', image)
     }
   })
 
   socket.on('disconnect', () => {
-    const findUser = userData.find(user => user.clientId === socket.id)
+    const foundUser = userData.find(user => user.clientId === socket.id)
 
-    if (findUser !== undefined) {
-      socket.leave(findUser?.roomName!)
+    if (foundUser !== undefined) {
+      socket.leave(foundUser?.roomName!)
 
       deleteUser(socket.id)
 
       allMessageFromRoom = []
       
-      io.to(findUser?.roomName!).emit('roomMessage', `${findUser?.userName} left the ${findUser?.roomName}`)
+      io.to(foundUser?.roomName!).emit('roomMessage', `${foundUser?.userName} left the ${foundUser?.roomName}`)
 
       userData = userData.filter(user => user.clientId !== socket.id)
     }

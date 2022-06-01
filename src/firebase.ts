@@ -8,9 +8,9 @@ import {
   setDoc
 } from 'firebase/firestore'
 import {
-  Person,
-  PersonSendImage,
-  PersonSendMessage
+  ImageMessage,
+  TextMessage,
+  User
 } from './types'
 
 const firebaseConfig = {
@@ -26,23 +26,19 @@ const db = getFirestore(firebaseapp)
 
 export let allMessageInRoom: Array<DocumentData | undefined> = []
 
-export const addUser = async (user: Person) => {
+export const addUser = async (user: User) => {
   const { clientId, userName, roomName } = user
 
   await setDoc(doc(db, 'users', clientId), {
     userName,
     roomName
   })
-    .catch(error => {
-      alert(error)
-    })
+    .catch(error => alert(error))
 }
 
-export const getMessageFromRoom = async (room: string, messages: Array<PersonSendImage | PersonSendMessage>) => {
+export const getMessageFromRoom = async (room: string, messages: Array<ImageMessage | TextMessage>) => {
   await setDoc(doc(db, 'rooms', room), { messages })
-    .catch(error => {
-      alert(error)
-    })
+    .catch(error => alert(error))
 }
 
 export const addMessageToRoom = async (roomName: string) => {
@@ -50,9 +46,7 @@ export const addMessageToRoom = async (roomName: string) => {
 
   const docRef = doc(db, 'rooms', roomName)
   const docSnap = await getDoc(docRef)
-    .catch(error => {
-      alert(error)
-    })
+    .catch(error => alert(error))
 
   const docData = docSnap?.data()
 
@@ -63,7 +57,5 @@ export const addMessageToRoom = async (roomName: string) => {
 
 export const deleteUser = async (clientId: string) => {
   await deleteDoc(doc(db, 'users', clientId))
-    .catch(error => {
-      alert(error)
-    })
+    .catch(error => alert(error))
 }
