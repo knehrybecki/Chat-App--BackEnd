@@ -33,20 +33,21 @@ export const addUser = async (user: User) => {
   await setDoc(doc(db, 'users', userUUID), {
     userName,
     roomUUID,
-  }).catch((error) => alert(error))
+  })
+    .catch((error) => alert(error))
 }
 
 export const getMessageFromRoom = async (room: string, messages: Array<ImageMessage | TextMessage>) => {
-  await setDoc(doc(db, 'rooms', room), {
-    messages,
-  }).catch((error) => alert(error))
+  await setDoc(doc(db, 'rooms', room), messages)
+    .catch((error) => alert(error))
 }
 
 export const addMessageToRoom = async (roomName: string) => {
   allMessagesInRoom = []
 
   const docRef = doc(db, 'rooms', roomName)
-  const docSnap = await getDoc(docRef).catch((error) => alert(error))
+  const docSnap = await getDoc(docRef)
+    .catch((error) => alert(error))
 
   const docData = docSnap?.data()
 
@@ -56,5 +57,6 @@ export const addMessageToRoom = async (roomName: string) => {
 }
 
 export const deleteUser = async (userUUID: string) => {
-  await deleteDoc(doc(db, 'users', userUUID)).catch((error) => alert(error))
+  await deleteDoc(doc(db, 'users', userUUID))
+    .catch((error) => alert(error))
 }
