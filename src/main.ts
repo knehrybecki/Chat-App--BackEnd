@@ -1,18 +1,13 @@
+import 'dotenv/config'
 import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
-import {
-  addMessageToRoom,
-  addUser,
-  allMessagesInRoom,
-  deleteUser,
-  getMessageFromRoom
-} from './firebase'
-import {
-  ImageMessage,
-  TextMessage,
-  User
-} from './types'
+import { addingMessagesFromDatabaseToRoom } from './firebase/actionInDatabase.ts/addingMessagesFromDatabaseToRoom'
+import { addingMessagesToDatabase } from './firebase/actionInDatabase.ts/addingMessagesToDatabase'
+import { addedUserToDatabase } from './firebase/actionInDatabase.ts/addUserToDatabase'
+import { deleteUser } from './firebase/actionInDatabase.ts/deleteUser'
+import { getingAllUserFromDatabase } from './firebase/actionInDatabase.ts/getingAllUserFromDatabase'
+import { ImageMessage, TextMessage, User } from './types'
 
 const app = express()
 const server = createServer(app)
@@ -23,72 +18,42 @@ const io = new Server(server, {
   },
 })
 
-let userData: Array<User> = []
-export let allMessagesFromRoom: Array<ImageMessage | TextMessage> = []
-
-io.on('connection', (socket) => {
+io.on('connection', socket => {
   socket.on('userData', async (user: User) => {
-    userData = userData.concat(user)
-
     const roomName = user.roomUUID
 
     socket.join(roomName)
 
-    addUser(user)
+    addedUserToDatabase(user)
 
-    await addMessageToRoom(roomName)
+   const allMessages =  await addingMessagesFromDatabaseToRoom(roomName)
 
-    socket.emit('roomMessage', `You Joined to ${user.roomUUID}`, allMessagesInRoom)
+    socket.emit('roomMessage', `You Joined to ${roomName}`, allMessages)
 
     socket.broadcast.to(roomName).emit('roomMessage', `${user.userName} Joined to ${user.roomUUID}`)
   })
 
-  socket.on('chatMessage', (messages: TextMessage) => {
-    const foundUser = userData.find((user) => user.userUUID === socket.id)
-    const { userName, userUUID, roomUUID, createdAt, text, type } = messages
-    const dataMessage = {
-      userName,
-      userUUID,
-      roomUUID,
-      createdAt,
-      text,
-      type
-    }
+  socket.on('chatMessage', (messages: TextMessage, allMessages: Array<ImageMessage | TextMessage> ) => {
+      addingMessagesToDatabase(messages, allMessages)
 
-    if (foundUser) {
-      allMessagesFromRoom = allMessagesFromRoom.concat(dataMessage)
-
-      getMessageFromRoom(foundUser.roomUUID, allMessagesFromRoom)
-
-      io.to(foundUser.roomUUID).emit('message', dataMessage)
-    }
+      io.to(messages.roomUUID).emit('message', messages)
   })
 
-  socket.on('send-img', (image: ImageMessage) => {
-    const foundUser = userData.find((user) => user.userUUID === socket.id)
+  socket.on('sendImage', (image: ImageMessage, allMessages: Array<ImageMessage | TextMessage>) => {
+    addingMessagesToDatabase(image, allMessages)
 
-    allMessagesFromRoom = allMessagesFromRoom.concat(image)
-
-    if (foundUser) {
-      getMessageFromRoom(foundUser.roomUUID, allMessagesFromRoom)
-
-      io.to(foundUser.roomUUID!).emit('image', image)
-    }
+      io.to(image.roomUUID).emit('image', image)
   })
 
-  socket.on('disconnect', () => {
-    const foundUser = userData.find((user) => user.userUUID === socket.id)
+  socket.on('disconnect', async () => {
+     const user = await getingAllUserFromDatabase(socket.id)
 
-    if (foundUser) {
-      socket.leave(foundUser.roomUUID)
+    if (user) {
+      socket.leave(user.roomUUID)
 
-      deleteUser(socket.id)
+      deleteUser(user.userUUID)
 
-      allMessagesFromRoom = []
-
-      io.to(foundUser.roomUUID).emit('roomMessage', `${foundUser.userName} left the ${foundUser?.roomUUID}`)
-
-      userData = userData.filter((user) => user.userUUID !== socket.id)
+      io.to(user.roomUUID).emit('roomMessage', `${user.userName} left the ${user.roomUUID}`)
     }
   })
 })
