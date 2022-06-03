@@ -1,11 +1,11 @@
 import { collection, DocumentData, getDocs } from 'firebase/firestore'
-import { User } from '../../types'
+import { firebaseCollection, User } from '../../types'
 import { db } from '../firebase'
 
 export const getingAllUserFromDatabase = async (userUUID: string) => {
     let user: DocumentData = []
   
-    const querySnapshot = await getDocs(collection(db, "users"))
+    const querySnapshot = await getDocs(collection(db, firebaseCollection.users))
       .catch((error) => alert(error))
   
     querySnapshot?.forEach(doc => {

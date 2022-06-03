@@ -1,6 +1,6 @@
 export enum MessageType {
-    Text = 'text',
-    Image = 'image'
+  Text = 'text',
+  Image = 'image'
 }
 export interface User {
   userName: string
@@ -22,4 +22,9 @@ export interface TextMessage extends Message {
 export interface ImageMessage extends Message {
   imageUrl: string,
   type: MessageType.Image
+}
+
+export enum firebaseCollection {
+  users = 'users',
+  rooms = 'rooms'
 }

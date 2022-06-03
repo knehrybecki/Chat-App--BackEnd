@@ -2,11 +2,11 @@ import 'dotenv/config'
 import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
-import { addingMessagesFromDatabaseToRoom } from './firebase/actionInDatabase.ts/addingMessagesFromDatabaseToRoom'
-import { addingMessagesToDatabase } from './firebase/actionInDatabase.ts/addingMessagesToDatabase'
-import { addedUserToDatabase } from './firebase/actionInDatabase.ts/addUserToDatabase'
-import { deleteUser } from './firebase/actionInDatabase.ts/deleteUser'
-import { getingAllUserFromDatabase } from './firebase/actionInDatabase.ts/getingAllUserFromDatabase'
+import { addedUserToDatabase } from './firebase/actionInDatabase/addedUserToDatabase'
+import { addMessagesFromDatabaseToRoom } from './firebase/actionInDatabase/addingMessagesFromDatabaseToRoom'
+import { addingMessagesToDatabase } from './firebase/actionInDatabase/addingMessagesToDatabase'
+import { deleteUser } from './firebase/actionInDatabase/deleteUser'
+import { getingAllUserFromDatabase } from './firebase/actionInDatabase/getingAllUserFromDatabase'
 import { ImageMessage, TextMessage, User } from './types'
 
 const app = express()
@@ -26,7 +26,7 @@ io.on('connection', socket => {
 
     addedUserToDatabase(user)
 
-   const allMessages =  await addingMessagesFromDatabaseToRoom(roomName)
+   const allMessages =  await addMessagesFromDatabaseToRoom(roomName)
 
     socket.emit('roomMessage', `You Joined to ${roomName}`, allMessages)
 
