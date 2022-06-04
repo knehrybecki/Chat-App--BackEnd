@@ -28,3 +28,16 @@ export enum firebaseCollection {
   users = 'users',
   rooms = 'rooms'
 }
+
+export enum firebaseSearch {
+  userUUID = 'userUUID'
+}
+
+export enum sockets {
+  roomMessage = 'roomMessage',
+  image = 'image',
+  message = 'message',
+  chatMessage = 'chatMessage',
+  sendImage = 'sendImage',
+  userData= 'userData'
+}

@@ -1,20 +1,16 @@
-import { collection, DocumentData, getDocs } from 'firebase/firestore'
-import { firebaseCollection, User } from '../../types'
+import { collection, getDocs, query, where } from 'firebase/firestore'
+import { firebaseCollection, firebaseSearch, User } from '../../types'
 import { db } from '../firebase'
 
 export const getingAllUserFromDatabase = async (userUUID: string) => {
-    let user: DocumentData = []
-  
-    const querySnapshot = await getDocs(collection(db, firebaseCollection.users))
-      .catch((error) => alert(error))
-  
-    querySnapshot?.forEach(doc => {
-      const docData = doc?.data()
-  
-      user = user.concat(docData)
+  const foundUser = query(collection(db, firebaseCollection.users), where(firebaseSearch.userUUID, '==', userUUID))
+  const user = await getDocs(foundUser)
+    .then(res => {
+      res.forEach(doc => {
+        return doc.data()
+      })
     })
-  
-    const foundUser = user.find((user: User) => user.userUUID === userUUID)
-  
-    return foundUser
-  }
+    .catch(error => alert(error))
+
+  return user as unknown as User
+}

@@ -10,4 +10,8 @@ export const addedUserToDatabase = (user: User) => {
     roomUUID,
     userUUID
   })
+    .then(res => {
+      return res
+    })
+    .catch(error => alert(error))
 }
