@@ -24,16 +24,16 @@ export interface ImageMessage extends Message {
   type: MessageType.Image
 }
 
-export enum firebaseCollection {
+export enum FirebaseCollection {
   users = 'users',
   rooms = 'rooms'
 }
 
-export enum firebaseSearch {
+export enum FirebaseSearch {
   userUUID = 'userUUID'
 }
 
-export enum sockets {
+export enum Sockets {
   roomMessage = 'roomMessage',
   image = 'image',
   message = 'message',
