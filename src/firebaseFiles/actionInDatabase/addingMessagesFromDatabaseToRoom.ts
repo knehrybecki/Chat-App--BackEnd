@@ -1,5 +1,5 @@
-import { db } from 'firebase/firebase'
 import { doc, getDoc } from 'firebase/firestore'
+import { db } from 'firebaseFiles'
 import { FirebaseCollection } from 'types'
 
 export const addMessagesFromDatabaseToRoom = async (roomName: string) => {

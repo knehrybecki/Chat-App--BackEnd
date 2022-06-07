@@ -3,17 +3,18 @@ export enum MessageType {
   Image = 'image'
 }
 export interface User {
-  userName: string
+  personName: string
   userUUID: string
   roomUUID: string
 }
 
 type Message = {
-  userName: string
+  personName: string
   userUUID: string
   roomUUID: string
   createdAt: string
 }
+
 export interface TextMessage extends Message {
   text: string,
   type: MessageType.Text

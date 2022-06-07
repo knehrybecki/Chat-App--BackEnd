@@ -1,5 +1,5 @@
-import { db } from 'firebase/firebase'
 import { doc, setDoc } from 'firebase/firestore'
+import { db } from 'firebaseFiles'
 import { FirebaseCollection, ImageMessage, TextMessage } from 'types'
 
 export const addingMessagesToDatabase = (messages: ImageMessage | TextMessage, allMessages: Array<ImageMessage | TextMessage>) => {

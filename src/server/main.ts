@@ -2,11 +2,13 @@ import 'dotenv/config'
 import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
-import { addedUserToDatabase } from 'firebase/actionInDatabase/addedUserToDatabase'
-import { addMessagesFromDatabaseToRoom } from 'firebase/actionInDatabase/addingMessagesFromDatabaseToRoom'
-import { addingMessagesToDatabase } from 'firebase/actionInDatabase/addingMessagesToDatabase'
-import { deleteUser } from 'firebase/actionInDatabase/deleteUser'
-import { getingAllUserFromDatabase } from 'firebase/actionInDatabase/getingAllUserFromDatabase'
+import {
+  addedUserToDatabase,
+  addingMessagesToDatabase,
+  addMessagesFromDatabaseToRoom,
+  deleteUser,
+  getingAllUserFromDatabase
+} from 'firebaseFiles/actionInDatabase'
 import {
   ImageMessage,
   Sockets,
@@ -35,7 +37,7 @@ io.on('connection', socket => {
 
     socket.emit(Sockets.RoomMessage, `You Joined to ${roomName}`, allMessages)
 
-    socket.broadcast.to(roomName).emit(Sockets.RoomMessage, `${user.userName} Joined to ${user.roomUUID}`)
+    socket.broadcast.to(roomName).emit(Sockets.RoomMessage, `${user.personName} Joined to ${user.roomUUID}`)
   })
 
   socket.on(Sockets.ChatMessage, (messages: TextMessage, allMessages: Array<ImageMessage | TextMessage> ) => {
@@ -58,7 +60,7 @@ io.on('connection', socket => {
 
       deleteUser(user.userUUID)
 
-      io.to(user.roomUUID).emit(Sockets.RoomMessage, `${user.userName} left the ${user.roomUUID}`)
+      io.to(user.roomUUID).emit(Sockets.RoomMessage, `${user.personName} left the ${user.roomUUID}`)
     }
   })
 })
