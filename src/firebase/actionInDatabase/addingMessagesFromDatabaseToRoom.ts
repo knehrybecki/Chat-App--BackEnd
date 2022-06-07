@@ -1,12 +1,10 @@
-import { FirebaseCollection } from '../../types'
+import { db } from 'firebase/firebase'
 import { doc, getDoc } from 'firebase/firestore'
-import { db } from '../firebase'
+import { FirebaseCollection } from 'types'
 
 export const addMessagesFromDatabaseToRoom = async (roomName: string) => {
-  const messages = await getDoc(doc(db, FirebaseCollection.rooms, roomName))
-    .then(res => {
-      return res.data()
-    })
+  const messages = await getDoc(doc(db, FirebaseCollection.Rooms, roomName))
+    .then(res => res.data())
     .catch(error => {
       alert(error)
 

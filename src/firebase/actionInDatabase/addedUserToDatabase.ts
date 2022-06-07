@@ -1,11 +1,11 @@
-import { FirebaseCollection, User } from '../../types'
+import { db } from 'firebase/firebase'
 import { doc, setDoc } from 'firebase/firestore'
-import { db } from '../firebase'
+import { FirebaseCollection, User } from 'types'
 
 export const addedUserToDatabase = (user: User) => {
   const { userName, userUUID, roomUUID } = user
 
-  setDoc(doc(db, FirebaseCollection.users, userUUID), {
+  setDoc(doc(db, FirebaseCollection.Users, userUUID), {
     userName,
     roomUUID,
     userUUID,

@@ -1,17 +1,15 @@
-import { FirebaseCollection, User } from '../../types'
+import { db } from 'firebase/firebase'
 import { doc, getDoc } from 'firebase/firestore'
-import { db } from '../firebase'
+import { FirebaseCollection, User } from 'types'
 
 export const getingAllUserFromDatabase = async (userUUID: string) => {
-  const user = await getDoc(doc(db, FirebaseCollection.users, userUUID))
-    .then(res => {
-      return res.data()
-    })
+  const user = await getDoc(doc(db, FirebaseCollection.Users, userUUID))
+    .then(res => res.data())
     .catch(error => {
       alert(error)
 
       return undefined
     })
 
-  return user as User
+  return user as User | undefined
 }

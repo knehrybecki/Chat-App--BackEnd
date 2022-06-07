@@ -1,8 +1,8 @@
-import { FirebaseCollection } from '../../types'
+import { db } from 'firebase/firebase'
 import { deleteDoc, doc } from 'firebase/firestore'
-import { db } from '../firebase'
+import { FirebaseCollection } from 'types'
 
 export const deleteUser = (userUUID: string) => {
-    deleteDoc(doc(db, FirebaseCollection.users, userUUID))
+    deleteDoc(doc(db, FirebaseCollection.Users, userUUID))
         .catch(error => alert(error))
 }

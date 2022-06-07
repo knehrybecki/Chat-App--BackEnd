@@ -2,17 +2,17 @@ import 'dotenv/config'
 import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
+import { addedUserToDatabase } from 'firebase/actionInDatabase/addedUserToDatabase'
+import { addMessagesFromDatabaseToRoom } from 'firebase/actionInDatabase/addingMessagesFromDatabaseToRoom'
+import { addingMessagesToDatabase } from 'firebase/actionInDatabase/addingMessagesToDatabase'
+import { deleteUser } from 'firebase/actionInDatabase/deleteUser'
+import { getingAllUserFromDatabase } from 'firebase/actionInDatabase/getingAllUserFromDatabase'
 import {
   ImageMessage,
   Sockets,
   TextMessage,
   User
-} from './types'
-import { addedUserToDatabase } from './firebase/actionInDatabase/addedUserToDatabase'
-import { addMessagesFromDatabaseToRoom } from './firebase/actionInDatabase/addingMessagesFromDatabaseToRoom'
-import { addingMessagesToDatabase } from './firebase/actionInDatabase/addingMessagesToDatabase'
-import { deleteUser } from './firebase/actionInDatabase/deleteUser'
-import { getingAllUserFromDatabase } from './firebase/actionInDatabase/getingAllUserFromDatabase'
+} from 'types'
 
 const app = express()
 const server = createServer(app)
@@ -24,7 +24,7 @@ const io = new Server(server, {
 })
 
 io.on('connection', socket => {
-  socket.on(Sockets.userData, async (user: User) => {
+  socket.on(Sockets.UserData, async (user: User) => {
     const roomName = user.roomUUID
 
     socket.join(roomName)
@@ -33,21 +33,21 @@ io.on('connection', socket => {
 
     const allMessages = await addMessagesFromDatabaseToRoom(roomName)
 
-    socket.emit(Sockets.roomMessage, `You Joined to ${roomName}`, allMessages)
+    socket.emit(Sockets.RoomMessage, `You Joined to ${roomName}`, allMessages)
 
-    socket.broadcast.to(roomName).emit(Sockets.roomMessage, `${user.userName} Joined to ${user.roomUUID}`)
+    socket.broadcast.to(roomName).emit(Sockets.RoomMessage, `${user.userName} Joined to ${user.roomUUID}`)
   })
 
-  socket.on(Sockets.chatMessage, (messages: TextMessage, allMessages: Array<ImageMessage | TextMessage> ) => {
+  socket.on(Sockets.ChatMessage, (messages: TextMessage, allMessages: Array<ImageMessage | TextMessage> ) => {
       addingMessagesToDatabase(messages, allMessages)
 
-      io.to(messages.roomUUID).emit(Sockets.message, messages)
+      io.to(messages.roomUUID).emit(Sockets.Message, messages)
   })
 
-  socket.on(Sockets.sendImage, (image: ImageMessage, allMessages: Array<ImageMessage | TextMessage>) => {
+  socket.on(Sockets.SendImage, (image: ImageMessage, allMessages: Array<ImageMessage | TextMessage>) => {
     addingMessagesToDatabase(image, allMessages)
 
-    io.to(image.roomUUID).emit(Sockets.image, image)
+    io.to(image.roomUUID).emit(Sockets.Image, image)
   })
 
   socket.on('disconnect', async () => {
@@ -58,7 +58,7 @@ io.on('connection', socket => {
 
       deleteUser(user.userUUID)
 
-      io.to(user.roomUUID).emit(Sockets.roomMessage, `${user.userName} left the ${user.roomUUID}`)
+      io.to(user.roomUUID).emit(Sockets.RoomMessage, `${user.userName} left the ${user.roomUUID}`)
     }
   })
 })

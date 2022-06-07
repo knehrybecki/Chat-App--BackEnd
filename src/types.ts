@@ -25,19 +25,19 @@ export interface ImageMessage extends Message {
 }
 
 export enum FirebaseCollection {
-  users = 'users',
-  rooms = 'rooms'
+  Users = 'users',
+  Rooms = 'rooms',
 }
 
 export enum FirebaseSearch {
-  userUUID = 'userUUID'
+  UserUUID = 'userUUID'
 }
 
 export enum Sockets {
-  roomMessage = 'roomMessage',
-  image = 'image',
-  message = 'message',
-  chatMessage = 'chatMessage',
-  sendImage = 'sendImage',
-  userData= 'userData'
+  RoomMessage = 'roomMessage',
+  Image = 'image',
+  Message = 'message',
+  ChatMessage = 'chatMessage',
+  SendImage = 'sendImage',
+  UserData= 'userData'
 }
