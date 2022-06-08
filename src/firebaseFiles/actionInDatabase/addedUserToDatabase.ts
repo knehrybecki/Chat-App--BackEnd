@@ -3,10 +3,10 @@ import { db } from 'firebaseFiles'
 import { FirebaseCollection, User } from 'types'
 
 export const addedUserToDatabase = (user: User) => {
-  const { personName, userUUID, roomUUID } = user
+  const { UserName, userUUID, roomUUID } = user
 
   setDoc(doc(db, FirebaseCollection.Users, userUUID), {
-    personName,
+    UserName,
     roomUUID,
     userUUID,
   })

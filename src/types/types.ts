@@ -3,7 +3,7 @@ export enum MessageType {
   Image = 'image'
 }
 export interface User {
-  personName: string
+  UserName: string
   userUUID: string
   roomUUID: string
 }

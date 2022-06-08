@@ -37,7 +37,7 @@ io.on('connection', socket => {
 
     socket.emit(Sockets.RoomMessage, `You Joined to ${roomName}`, allMessages)
 
-    socket.broadcast.to(roomName).emit(Sockets.RoomMessage, `${user.personName} Joined to ${user.roomUUID}`)
+    socket.broadcast.to(roomName).emit(Sockets.RoomMessage, `${user.UserName} Joined to ${user.roomUUID}`)
   })
 
   socket.on(Sockets.ChatMessage, (messages: TextMessage, allMessages: Array<ImageMessage | TextMessage> ) => {
@@ -60,7 +60,7 @@ io.on('connection', socket => {
 
       deleteUser(user.userUUID)
 
-      io.to(user.roomUUID).emit(Sockets.RoomMessage, `${user.personName} left the ${user.roomUUID}`)
+      io.to(user.roomUUID).emit(Sockets.RoomMessage, `${user.UserName} left the ${user.roomUUID}`)
     }
   })
 })
