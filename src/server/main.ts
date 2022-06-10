@@ -8,13 +8,13 @@ import {
   addMessagesFromDatabaseToRoom,
   deleteUser,
   getingAllUserFromDatabase
-} from 'firebaseFiles/actionInDatabase'
+} from '../firebaseFiles/actionInDatabase'
 import {
   ImageMessage,
   Sockets,
   TextMessage,
   User
-} from 'types'
+} from '../types'
 
 const app = express()
 const server = createServer(app)
@@ -37,7 +37,7 @@ io.on('connection', socket => {
 
     socket.emit(Sockets.RoomMessage, `You Joined to ${roomName}`, allMessages)
 
-    socket.broadcast.to(roomName).emit(Sockets.RoomMessage, `${user.UserName} Joined to ${user.roomUUID}`)
+    socket.broadcast.to(roomName).emit(Sockets.RoomMessage, `${user.userName} Joined to ${user.roomUUID}`)
   })
 
   socket.on(Sockets.ChatMessage, (messages: TextMessage, allMessages: Array<ImageMessage | TextMessage> ) => {
@@ -60,7 +60,7 @@ io.on('connection', socket => {
 
       deleteUser(user.userUUID)
 
-      io.to(user.roomUUID).emit(Sockets.RoomMessage, `${user.UserName} left the ${user.roomUUID}`)
+      io.to(user.roomUUID).emit(Sockets.RoomMessage, `${user.userName} left the ${user.roomUUID}`)
     }
   })
 })

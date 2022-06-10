@@ -3,10 +3,10 @@ export {
     MessageType,
     FirebaseCollection,
     FirebaseSearch
-} from 'types/types'
+} from '../types/types'
 
 export type {
     ImageMessage,
     TextMessage,
     User
-} from 'types/types'
+} from '../types/types'
