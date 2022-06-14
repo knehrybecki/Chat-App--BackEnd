@@ -1,8 +1,8 @@
 import { doc, setDoc } from 'firebase/firestore'
-import { db } from '../../firebaseFiles'
+import { db } from '../firebaseConfig'
 import { FirebaseCollection, User } from '../../types'
 
-export const addedUserToDatabase = (user: User) => {
+export const addUser = (user: User) => {
   const { userName, userUUID, roomUUID } = user
 
   setDoc(doc(db, FirebaseCollection.Users, userUUID), {
@@ -10,5 +10,4 @@ export const addedUserToDatabase = (user: User) => {
     roomUUID,
     userUUID,
   })
-    .catch(error => alert(error))
 }

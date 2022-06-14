@@ -3,12 +3,12 @@ import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import {
-  addedUserToDatabase,
+  addUser,
   addingMessagesToDatabase,
   addMessagesFromDatabaseToRoom,
   deleteUser,
-  getingAllUserFromDatabase
-} from '../firebaseFiles/actionInDatabase'
+  getUser
+} from '../firebaseFiles'
 import {
   ImageMessage,
   Sockets,
@@ -31,7 +31,7 @@ io.on('connection', socket => {
 
     socket.join(roomName)
 
-    addedUserToDatabase(user)
+    addUser(user)
 
     const allMessages = await addMessagesFromDatabaseToRoom(roomName)
 
@@ -40,20 +40,24 @@ io.on('connection', socket => {
     socket.broadcast.to(roomName).emit(Sockets.RoomMessage, `${user.userName} Joined to ${user.roomUUID}`)
   })
 
-  socket.on(Sockets.ChatMessage, (messages: TextMessage, allMessages: Array<ImageMessage | TextMessage> ) => {
-      addingMessagesToDatabase(messages, allMessages)
+  socket.on(Sockets.ChatMessage, (message: TextMessage, allMessages: Array<ImageMessage | TextMessage>) => {
+    const roomUUID = message.roomUUID
 
-      io.to(messages.roomUUID).emit(Sockets.Message, messages)
+    addingMessagesToDatabase(roomUUID, allMessages)
+
+    io.to(message.roomUUID).emit(Sockets.Message, message)
   })
 
   socket.on(Sockets.SendImage, (image: ImageMessage, allMessages: Array<ImageMessage | TextMessage>) => {
-    addingMessagesToDatabase(image, allMessages)
+    const roomUUID = image.roomUUID
+
+    addingMessagesToDatabase(roomUUID, allMessages)
 
     io.to(image.roomUUID).emit(Sockets.Image, image)
   })
 
   socket.on('disconnect', async () => {
-    const user = await getingAllUserFromDatabase(socket.id)
+    const user = await getUser(socket.id)
 
     if (user) {
       socket.leave(user.roomUUID)
