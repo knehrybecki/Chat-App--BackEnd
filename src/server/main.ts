@@ -3,10 +3,8 @@ import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import {
-  addUser,
   addingMessagesToDatabase,
-  addMessagesFromDatabaseToRoom,
-  deleteUser,
+  addMessagesFromDatabaseToRoom, addUser, deleteUser,
   getUser
 } from '../firebaseFiles'
 import {
@@ -31,9 +29,9 @@ io.on('connection', socket => {
 
     socket.join(roomName)
 
-    addUser(user)
+    addUser(user, socket)
 
-    const allMessages = await addMessagesFromDatabaseToRoom(roomName)
+    const allMessages = await addMessagesFromDatabaseToRoom(roomName, socket)
 
     socket.emit(Sockets.RoomMessage, `You Joined to ${roomName}`, allMessages)
 
@@ -43,7 +41,7 @@ io.on('connection', socket => {
   socket.on(Sockets.ChatMessage, (message: TextMessage, allMessages: Array<ImageMessage | TextMessage>) => {
     const roomUUID = message.roomUUID
 
-    addingMessagesToDatabase(roomUUID, allMessages)
+    addingMessagesToDatabase(roomUUID, allMessages, socket)
 
     io.to(message.roomUUID).emit(Sockets.Message, message)
   })
@@ -51,18 +49,18 @@ io.on('connection', socket => {
   socket.on(Sockets.SendImage, (image: ImageMessage, allMessages: Array<ImageMessage | TextMessage>) => {
     const roomUUID = image.roomUUID
 
-    addingMessagesToDatabase(roomUUID, allMessages)
+    addingMessagesToDatabase(roomUUID, allMessages, socket)
 
     io.to(image.roomUUID).emit(Sockets.Image, image)
   })
 
   socket.on('disconnect', async () => {
-    const user = await getUser(socket.id)
+    const user = await getUser(socket)
 
     if (user) {
       socket.leave(user.roomUUID)
 
-      deleteUser(user.userUUID)
+      deleteUser(user.userUUID, socket)
 
       io.to(user.roomUUID).emit(Sockets.RoomMessage, `${user.userName} left the ${user.roomUUID}`)
     }

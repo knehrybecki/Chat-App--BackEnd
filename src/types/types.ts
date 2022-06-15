@@ -40,5 +40,6 @@ export enum Sockets {
   Message = 'message',
   ChatMessage = 'chatMessage',
   SendImage = 'sendImage',
-  UserData= 'userData'
+  UserData= 'userData',
+  Errors = 'error'
 }
