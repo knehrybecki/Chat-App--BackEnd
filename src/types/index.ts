@@ -8,5 +8,6 @@ export {
 export type {
     ImageMessage,
     TextMessage,
-    User
+    User,
+    SocketEvent
 } from './types'

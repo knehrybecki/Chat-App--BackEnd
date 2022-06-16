@@ -1,3 +1,6 @@
+import { Socket } from 'socket.io'
+import { DefaultEventsMap } from 'socket.io/dist/typed-events'
+
 export enum MessageType {
   Text = 'text',
   Image = 'image'
@@ -43,3 +46,5 @@ export enum Sockets {
   UserData= 'userData',
   Errors = 'error'
 }
+
+export type SocketEvent = Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>

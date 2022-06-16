@@ -4,7 +4,9 @@ import { createServer } from 'http'
 import { Server } from 'socket.io'
 import {
   addingMessagesToDatabase,
-  addMessagesFromDatabaseToRoom, addUser, deleteUser,
+  addMessagesFromDatabaseToRoom,
+  addUser,
+  deleteUser,
   getUser
 } from '../firebaseFiles'
 import {
