@@ -7,7 +7,7 @@ import { db } from '../firebaseConfig'
 export const getUser = async (socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
   const user = await getDoc(doc(db, FirebaseCollection.Users, socket.id))
     .then(res => res.data())
-    .catch((error) => {
+    .catch(error => {
       socket.emit(Sockets.Errors, error)
     })
 

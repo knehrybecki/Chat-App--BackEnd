@@ -7,7 +7,7 @@ import { db } from '../firebaseConfig'
 export const addMessagesFromDatabaseToRoom = async (roomName: string, socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
   const messages = await getDoc(doc(db, FirebaseCollection.Rooms, roomName))
     .then(res => res.data())
-    .catch((error) => {
+    .catch(error => {
       socket.emit(Sockets.Errors, error)
     })
 

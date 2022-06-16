@@ -6,7 +6,7 @@ import { db } from '../firebaseConfig'
 
 export const deleteUser = (userUUID: string, socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
     deleteDoc(doc(db, FirebaseCollection.Users, userUUID))
-        .catch((error) => {
+        .catch(error => {
             socket.emit(Sockets.Errors, error)
         })
 }

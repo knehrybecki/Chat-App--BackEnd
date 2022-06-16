@@ -6,7 +6,7 @@ import { db } from '../firebaseConfig'
 
 export const addingMessagesToDatabase = (roomUUID: string, allMessages: Array<ImageMessage | TextMessage>, socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
   setDoc(doc(db, FirebaseCollection.Rooms, roomUUID), { allMessages })
-    .catch((error) => {
+    .catch(error => {
       socket.emit(Sockets.Errors, error)
     })
 }

@@ -12,7 +12,7 @@ export const addUser = (user: User, socket: Socket<DefaultEventsMap, DefaultEven
     roomUUID,
     userUUID,
   })
-    .catch((error) => {
+    .catch(error => {
       socket.emit(Sockets.Errors, error)
     })
 }
